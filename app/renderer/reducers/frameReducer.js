@@ -117,6 +117,13 @@ const frameReducer = (state, action, immutableAction) => {
         state = state.setIn(['frames', index, 'title'], title)
       }
 
+      // Unlike tabValue, active state for changeInfo will be fired only once
+      // when a tab is set to active, and will not be updated for the same tab
+      // as long as it remains active.
+      // This likely deprecates tabValue but still lacks state for fresh profile.
+      // TODO check if changeInfo is a better fit than tabValue and make use
+      // of it app-wise and deprecate the latter.
+      const tabActivated = immutableAction.getIn(['changeInfo', 'active'])
       // TODO fix race condition in Muon more info in #9000
       const active = immutableAction.getIn(['tabValue', 'active'])
       const hasTabInHoverState = state.getIn(['ui', 'tabs', 'hoverTabIndex'])
@@ -131,7 +138,9 @@ const frameReducer = (state, action, immutableAction) => {
           }
           state = state.setIn(['frames', index, 'lastAccessedTime'], new Date().getTime())
 
-          state = frameStateUtil.updateTabPageIndex(state, tabId)
+          if (tabActivated) {
+            state = frameStateUtil.updateTabPageIndex(state, tabId)
+          }
         }
       }
       break

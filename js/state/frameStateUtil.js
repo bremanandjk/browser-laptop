@@ -461,16 +461,11 @@ function isPinned (state, frameKey) {
  */
 function updateTabPageIndex (state, tabId, tabsPerPage = getSetting(settings.TABS_PER_PAGE)) {
   const index = getFrameTabPageIndex(state, tabId, tabsPerPage)
-  const isTabInHoverState = !!getHoverTabIndex(state)
 
   if (index === -1) {
     return state
   }
 
-  // Do not update tabPageIndex if user is in hover mode
-  if (isTabInHoverState) {
-    return state
-  }
   return state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
 }
 const frameStatePath = (state, frameKey) => {
