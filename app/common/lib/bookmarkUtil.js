@@ -65,8 +65,18 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
   return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
 }
 
+let oldSites
+let lastValue
+let lastWidth
 const getToolbarBookmarks = (state) => {
   const sites = state.get('sites', Immutable.List())
+  if (sites === oldSites &&
+      lastWidth === window.innerWidth &&
+      lastValue) {
+    return lastValue
+  }
+  oldSites = sites
+  lastWidth = window.innerWidth
 
   const noParentItems = siteUtil.getBookmarks(sites)
     .filter((bookmark) => !bookmark.get('parentFolderId'))
@@ -115,11 +125,12 @@ const getToolbarBookmarks = (state) => {
     i++
   }
 
-  return {
+  lastValue = {
     visibleBookmarks: noParentItems.take(i).map((item, index) => index).toList(),
     // Show at most 100 items in the overflow menu
     hiddenBookmarks: noParentItems.skip(i).take(100).map((item, index) => index).toList()
   }
+  return lastValue
 }
 
 module.exports = {
